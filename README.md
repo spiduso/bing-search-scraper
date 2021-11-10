@@ -20,7 +20,7 @@ The maximum number of search result pages crawled for each search query or URL. 
 Bing Search returns content for set market.
 <hr>
 
-Country/Region|Default Language|Market code
+|Country/Region|Default Language|Market code|
 |---|---|---|
 Argentina|Spanish|es-AR
 Australia|English|en-AU
