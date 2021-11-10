@@ -21,7 +21,7 @@ Bing Search returns content for set market.
 <hr>
 
 Country/Region|Default Language|Market code
-|---|---|---
+|---|---|---|
 Argentina|Spanish|es-AR
 Australia|English|en-AU
 Austria|German|de-AT
