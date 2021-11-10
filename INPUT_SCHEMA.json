@@ -29,7 +29,7 @@
   },
   "marketCode": {
       "title": "Market Code",
-      "type": "String",
+      "type": "string",
       "description": "Bing Search returns content for set market.",
       "default": "",
       "editor": "select",
@@ -118,7 +118,7 @@
   },
   "languageCode":{
     "title": "Language",
-    "type": "String",
+    "type": "string",
     "description": "Language for the search results.",
     "default": "",
     "editor": "select",
