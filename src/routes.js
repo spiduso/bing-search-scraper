@@ -10,11 +10,13 @@ exports.handleStart = async ({ request, $ }) => {
     
     const urlResults = {'url': request.url};
     
+    // keyword
     if($('.b_searchbox').length > 0){
         log.info(`[START]: keyword - ${$('.b_searchbox').attr('value')}`);
         urlResults['keyword'] = $('.b_searchbox').attr('value');
     }
 
+    // results count
     if($('#b_tween > .sb_count').length > 0){
         const splitted = $('#b_tween > .sb_count').text().replaceAll(',', '').split(' ');
         
@@ -27,25 +29,34 @@ exports.handleStart = async ({ request, $ }) => {
             }
         }
     }
+    // no results, try 2 more times
     else if($('#b_results .b_no').length > 0){
-        urlResults['count'] = 0;
-        log.info('[START]: No results');
-        log.info($('body').text());
-        await Apify.pushData(urlResults);
-        return;
+        if(request.retryCount < 3){
+            throw new Error('No results found, retrying...')
+        }
+        else
+        {
+            urlResults['count'] = 0;
+            log.info('[START]: Tried 3 times but no result found.');
+            await Apify.pushData(urlResults);
+            return;
+        }
     }
 
+    // Page number
     if($('.sb_pagS.sb_pagS_bp').length > 0)
     {
         log.info(`[START]: Page number - ${$('.sb_pagS.sb_pagS_bp').text()}`);
         urlResults['pageNumber'] = $('.sb_pagS.sb_pagS_bp').text();
     }
 
+    // Include results
     if($('#sp_requery').length > 0){
         log.info(`[START]: Subquery - ${$('#sp_requery a').first().text()}`);
         urlResults['subquery'] = $('#sp_requery a').first().text();
     }
 
+    // TODO: Ads not tested yet
     const ads = [];
     $('#b_results .b_ad').each(function(){
         let ad = {};
@@ -58,18 +69,21 @@ exports.handleStart = async ({ request, $ }) => {
     if(ads.length > 0)
         urlResults['ads'] = ads;
 
+    
+    // topborder result
     const topBorders = [];
     $('#b_results > .b_topborder').each(function(){
         let topborder = {"type":"topborder"};
-        log.info(`[START]: Topborder - ${$(this).find('a').text()}`);
         topborder['title'] = $(this).find('.rwrl_cred a').text();
-        topborder['description'] = $(this).find('.rwrl_padref').text();
-        topborder['url'] = $(this).find('.rwrl_cred a').attr('href');
-        topBorders.push(topborder);
+        if(topborder['title']){
+            log.info(`[START]: Topborder - ${$(this).find('a').text()}`);
+            topborder['description'] = $(this).find('.rwrl_padref').text();
+            topborder['url'] = $(this).find('.rwrl_cred a').attr('href');
+            topBorders.push(topborder);
+        }
     })
     if(topBorders.length > 0)
         urlResults['topBorders'] = topBorders;
-
 
     // news results
     const newsArr = [];
@@ -90,6 +104,7 @@ exports.handleStart = async ({ request, $ }) => {
     if(newsArr.length > 0)
         urlResults['news'] = newsArr;
 
+    // image results
     const images = [];
     $('#b_results > .b_imgans').each(function(){
         $(this).find('.slide').each(function(){
@@ -107,8 +122,8 @@ exports.handleStart = async ({ request, $ }) => {
     if(images.length > 0)
         urlResults['images'] = images;
 
-    const videos = [];
     // video results
+    const videos = [];
     $('#b_results > .b_vidAns').each(function(index){
         $(this).find('.slide').each(function(index){
             let url = $(this).find('a').attr('href');
@@ -132,8 +147,8 @@ exports.handleStart = async ({ request, $ }) => {
         urlResults['videos'] = videos;
 
     
+    // generic results
     const pages = [];
-    // algo results
     $('#b_results > .b_algo').each(function(index){
         let algo = {};
         const title = $(this).find('h2 a').text();
@@ -151,20 +166,12 @@ exports.handleStart = async ({ request, $ }) => {
                 algo['date'] = date;
             }
         }
+        // rich card
         else if($(this).find('.b_richcard').length > 0){
-            /*
-            if($(this).find('.b_richcard div div .tab-content div div div .ipText').length > 0){
-                desc =log.info($(this).find('.b_richcard div div .tab-content div div div .ipText').text());                
-            }
-            else if($(this).find('.b_richcard div div .tab-content div ul li div').length > 0){
-                desc =log.info($(this).find('.b_richcard div div .tab-content div ul li div').text());          
-            }
-            else{
-                log.info('ale existuje jeste jiny')
-            }*/
             desc = $(this).find('.b_richcard').text();
             log.info(`[START] - Richcard - ${desc}`);
         }
+        // wiki rich card
         else if($(this).find('.b_wikiRichcard_noHeroSection').length > 0){
            desc = $(this).find('.tab-content').text();
            log.info(`[START]: Wiki richcard - ${desc}`)
@@ -176,10 +183,13 @@ exports.handleStart = async ({ request, $ }) => {
            algo['source'] = source;
            algo['textUnder'] = textUnder;
         }
+        // result with groups
         else if($(this).find('.b_algo_group').length > 0){
             log.info(`[START]: AlgoGroup - ${$(this).find('h2').first().text()}`);
             algo['type'] = 'algoGroup';
-            // dictionary
+            
+            //#region dictionary
+            /* TODO: To be finished
             if($(this).find('.rcDictionary').length > 0){
                 dictionary = {};
                 dictionary['word'] = $(this).find('.rcDicWord').text();
@@ -194,7 +204,11 @@ exports.handleStart = async ({ request, $ }) => {
                 
                 urlResults['dictionary'] = dictionary;
             }
-            else if($(this).find('.b_wiki_sub').length > 0){
+            */
+            //#endregion
+
+            // wiki group
+            if($(this).find('.b_wiki_sub').length > 0){
                 const wikiCards = [];
                 let wikiCard = {};
                 $(this).find('.b_wiki_sub_text').each(function(){
@@ -213,18 +227,17 @@ exports.handleStart = async ({ request, $ }) => {
                     wikiCards.push(wikiCard);
                 });
 
-
                 if(wikiCards.length > 0)
                     algo['wikiCards'] = wikiCards;
             }
-            else
-                desc = $(this).find('div').first().text();
         }
+        // TODO: To be tested
         else if($(this).find('#b_gridCarousel').length > 0){
             $(this).find('#b_gridCarousel').children('.slide').each(function(){
                 log.info(`[START]: Carousel - ${$(this).text()}`);
             });
         }
+        // List
         else if($(this).find('.b_dList').length > 0){
             list = [];
             let text = "";
@@ -239,6 +252,7 @@ exports.handleStart = async ({ request, $ }) => {
                 algo['list'] = list;
         }
         
+        // results recommended
         const recommendations = [];
         let recommended = {};
         if($(this).find('.pageRecoContainer').length > 0){
@@ -261,6 +275,7 @@ exports.handleStart = async ({ request, $ }) => {
     if(pages.length > 0)
         urlResults['pages'] = pages;
 
+    // results created by bing
     $('#b_results > .b_ans').each(function(index){
         // related search
         if($(this).find('.b_rs').length > 0){
@@ -313,7 +328,8 @@ exports.handleStart = async ({ request, $ }) => {
         }
     })
     
-    // right column
+    // Additional results in right column
+    // can be hidden for width smaller than ~1200px
     if($('#b_context').length > 0){
         $('#b_context .b_ans').each(function(){
             // see results for
@@ -329,9 +345,9 @@ exports.handleStart = async ({ request, $ }) => {
                 if(resultsFor.length > 0)
                     urlResults['resultsFor'] = resultsFor;
             }
-            else if($(this).find('.b_cbContainer_ent2').length > 0){
-
-            }
+            /*
+                TBD: Different main result for different markets with same content and visuals (en-US: .b_entityTP vs. de-DE: .b_cbContainer_ent2)
+            */
         });
     }
     await Apify.pushData(urlResults);
