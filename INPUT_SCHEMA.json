@@ -31,10 +31,8 @@
       "title": "Market Code",
       "type": "string",
       "description": "Bing Search returns content for set market.",
-      "default": "",
       "editor": "select",
       "enum": [
-        "",
         "es-AR",
         "en-AU",
         "de-AT",
@@ -79,11 +77,11 @@
         "Argentina",
         "Australia",
         "Austria",
-        "Belgium",
-        "Belgium",
+        "Belgium - Dutch",
+        "Belgium - French",
         "Brazil",
-        "Canada",
-        "Canada",
+        "Canada - English",
+        "Canada - French",
         "Chile",
         "Denmark",
         "Finland",
@@ -107,23 +105,21 @@
         "South Africa",
         "Spain",
         "Sweden",
-        "Switzerland",
-        "Switzerland",
+        "Switzerland - French",
+        "Switzerland - German",
         "Taiwan",
         "Turkey",
         "United Kingdom",
-        "United States",
-        "United States"
+        "United States - English",
+        "United States - Spanish"
         ]
   },
   "languageCode":{
     "title": "Language",
     "type": "string",
     "description": "Language for the search results.",
-    "default": "",
     "editor": "select",
     "enum":[
-      "",
       "ar",
       "eu",
       "bn",
@@ -176,7 +172,6 @@
       "vi"
     ],
     "enumTitles":[
-      "English",
       "Arabic",
       "Basque",
       "Bengali",
