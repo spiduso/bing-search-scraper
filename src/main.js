@@ -5,8 +5,8 @@
  */
 
 const Apify = require('apify');
-const { handleStart } = require('./src/routes');
-const { BING_DEFAULT_RESULTS_PER_PAGE } = require('./src/const');
+const { handleStart } = require('./routes');
+const { BING_DEFAULT_RESULTS_PER_PAGE } = require('./const');
 
 const { utils: { log } } = Apify;
 
@@ -47,20 +47,26 @@ function getUrls(queries, marketCode, languageCode, resultsPerPage, maxPagesPerQ
     const splittedQueries = queries.split('\n');
     const result = [];
     let parameters = '';
-    if (marketCode) { parameters += `&setmkt=${marketCode}`; }
-    if (languageCode) { parameters += `&setLang=${languageCode}`; }
-    if (resultsPerPage) { parameters += `&count=${resultsPerPage}`; }
+    if (marketCode) {
+        parameters += `&setmkt=${marketCode}`;
+    }
+    if (languageCode) {
+        parameters += `&setLang=${languageCode}`;
+    }
+    if (resultsPerPage) {
+        parameters += `&count=${resultsPerPage}`;
+    }
 
     // https://www.bing.com/search?q=student&setmkt=en-US&setLang=en"
-    for (let i = 0; i < splittedQueries.length; i++) {
-        if (splittedQueries[i].startsWith('https://www.bing.com/search?q=')) {
-            const url = splittedQueries[i] + parameters;
+    for (const splittedQuery of splittedQueries) {
+        if (splittedQuery.startsWith('https://www.bing.com/search?q=')) {
+            const url = splittedQuery + parameters;
 
             if (maxPagesPerQuery > 1) {
                 getPagesPerQuery(url, resultsPerPage, maxPagesPerQuery).forEach((x) => result.push(x));
             } else { result.push(url); }
         } else {
-            const url = `https://www.bing.com/search?q=${splittedQueries[i].replaceAll(' ', '%20')}${parameters}`;
+            const url = `https://www.bing.com/search?q=${splittedQuery.replaceAll(' ', '%20')}${parameters}`;
             if (maxPagesPerQuery > 1) {
                 getPagesPerQuery(url, resultsPerPage, maxPagesPerQuery).forEach((x) => result.push(x));
             } else { result.push(url); }

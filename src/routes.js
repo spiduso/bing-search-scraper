@@ -2,7 +2,6 @@ const Apify = require('apify');
 
 const { utils: { log } } = Apify;
 
-const { prependUrl } = require('./helpers');
 const { BING_WIKI_RICHCARD } = require('./const');
 
 exports.handleStart = async ({ request, $ }) => {
@@ -15,8 +14,9 @@ exports.handleStart = async ({ request, $ }) => {
     }
 
     // results count
-    if ($('#b_tween > .sb_count').length > 0) {
-        const splitted = $('#b_tween > .sb_count').text().replaceAll(',', '').split(' ');
+    const countEl = $('#b_tween > .sb_count');
+    if (countEl.length > 0) {
+        const splitted = countEl.text().replaceAll(',', '').split(' ');
 
         for (let i = 0; i < splitted.length; i++) {
             if (!Number.isNaN(splitted[i])) {
@@ -36,9 +36,10 @@ exports.handleStart = async ({ request, $ }) => {
     }
 
     // Page number
-    if ($('.sb_pagS.sb_pagS_bp').length > 0) {
-        log.info(`[START]: Page number - ${$('.sb_pagS.sb_pagS_bp').text()}`);
-        urlResults.pageNumber = $('.sb_pagS.sb_pagS_bp').text();
+    const pageNumEl = $('.sb_pagS.sb_pagS_bp');
+    if (pageNumEl.length > 0) {
+        log.info(`[START]: Page number - ${pageNumEl.text()}`);
+        urlResults.pageNumber = pageNumEl.text();
     }
 
     // Include results
@@ -49,132 +50,122 @@ exports.handleStart = async ({ request, $ }) => {
 
     // TODO: Ads not tested yet
     const ads = [];
-    $('#b_results .b_ad').each(function () {
+    $('#b_results .b_ad').each((_, el) => {
         const ad = {};
-        log.info(`[START]: AD - ${$(this).find('a').first().text()}`);
-        ad.title = $(this).find('a').first().text();
-        ad.url = $(this).find('a').attr('href');
-        ad.description = $(this).find('.b_caption p').text();
+        log.info(`[START]: AD - ${$(el).find('a').first().text()}`);
+        ad.title = $(el).find('a').first().text();
+        ad.url = $(el).find('a').attr('href');
+        ad.description = $(el).find('.b_caption p').text();
         ads.push(ad);
     });
-
-    if (ads.length > 0) {
-        urlResults.ads = ads;
-    }
+    urlResults.ads = ads;
 
     // topborder result
     const topBorders = [];
-    $('#b_results > .b_topborder').each(function () {
+    $('#b_results > .b_topborder').each((_, el) => {
         const topborder = { type: 'topborder' };
-        topborder.title = $(this).find('.rwrl_cred a').text();
+        topborder.title = $(el).find('.rwrl_cred a').text();
         if (topborder.title) {
-            log.info(`[START]: Topborder - ${$(this).find('a').text()}`);
-            topborder.description = $(this).find('.rwrl_padref').text();
-            topborder.url = $(this).find('.rwrl_cred a').attr('href');
+            log.info(`[START]: Topborder - ${$(el).find('a').text()}`);
+            topborder.description = $(el).find('.rwrl_padref').text();
+            topborder.url = $(el).find('.rwrl_cred a').attr('href');
             topBorders.push(topborder);
         }
     });
-    if (topBorders.length > 0) {
-        urlResults.topBorders = topBorders;
-    }
+    urlResults.topBorders = topBorders;
+
     // news results
     const newsArr = [];
-    $('#b_results > .b_nwsAns').each(function () {
+    $('#b_results > .b_nwsAns').each((_, newsEl) => {
         log.info('[START]: News');
-        $(this).find('#ans_nws .b_slidesContainer .slide').each(function () {
+        $(newsEl).find('#ans_nws .b_slidesContainer .slide').each((_0, el) => {
             const news = { type: 'news' };
-            const text = $(this).find('.b_promtxt').text();
+            const text = $(el).find('.b_promtxt').text();
             if (text.length > 0) {
                 news.text = text;
-                news.source = $(this).find('.na_footer_name').text();
-                news.time = $(this).find('.b_secondaryText').text().substr(3);
-                news.url = $(this).find('.b_cap > a').attr('href');
+                news.source = $(el).find('.na_footer_name').text();
+                news.time = $(el).find('.b_secondaryText').text().substr(3);
+                news.url = $(el).find('.b_cap > a').attr('href');
                 newsArr.push(news);
             }
         });
     });
-    if (newsArr.length > 0) {
-        urlResults.news = newsArr;
-    }
+    urlResults.news = newsArr;
 
     // image results
     const images = [];
-    $('#b_results > .b_imgans').each(function () {
-        $(this).find('.slide').each(function () {
+    $('#b_results > .b_imgans').each((_, imgEl) => {
+        $(imgEl).find('.slide').each((_0, el) => {
             const img = {};
-            let url = $(this).find('.imgText').attr('href');
+            let url = $(el).find('.imgText').attr('href');
             if (url) {
-                url = prependUrl(url);
+                url = new URL(url, `https://www.bing.com`);
                 img.url = url;
-                img.description = $(this).find('.imgText').text();
-                log.info(`[START]: Image - ${$(this).find('.imgText').text()}`);
+                img.description = $(el).find('.imgText').text();
+                log.info(`[START]: Image - ${$(el).find('.imgText').text()}`);
                 images.push(img);
             }
         });
     });
-    if (images.length > 0) {
-        urlResults.images = images;
-    }
+    urlResults.images = images;
 
     // video results
     const videos = [];
-    $('#b_results > .b_vidAns').each(function () {
-        $(this).find('.slide').each(function () {
-            let url = $(this).find('a').attr('href');
+    $('#b_results > .b_vidAns').each((_, vidEl) => {
+        $(vidEl).find('.slide').each((_0, el) => {
+            let url = $(el).find('a').attr('href');
             if (url[0] === '/') {
-                url = prependUrl(url);
+                url = new URL(url, `https://www.bing.com`);
             }
             const video = { url };
-            const title = $(this).find('.mc_vtvc_title').text();
+            const title = $(el).find('.mc_vtvc_title').text();
             if (title !== '') {
-                video.channel = $(this).find('.mc_vtvc_meta .mc_vtvc_meta_row_channel').text();
-                video.date = $(this).find('.mc_vtvc_meta .meta_pd_content').text();
+                video.channel = $(el).find('.mc_vtvc_meta .mc_vtvc_meta_row_channel').text();
+                video.date = $(el).find('.mc_vtvc_meta .meta_pd_content').text();
                 video.title = title;
-                log.info(`[START]: Video - ${$(this).find('.mc_vtvc_title').text()}`);
-                video.views = $(this).find('.meta_vc_content').text();
-                video.provider = $(this).find('.mc_vtvc_meta_channel > span').first().text();
-                videos.push(video);
+                log.info(`[START]: Video - ${$(el).find('.mc_vtvc_title').text()}`);
+                video.views = $(el).find('.meta_vc_content').text();
+                video.provider = $(el).find('.mc_vtvc_meta_channel > span').first().text();
+                videos.push(el);
             }
         });
     });
-
-    if (videos.length > 0) {
-        urlResults.videos = videos;
-    }
+    urlResults.videos = videos;
 
     // generic results
     const pages = [];
-    $('#b_results > .b_algo').each(function () {
+
+    $('#b_results > .b_algo').each((_, algoEl) => {
         const algo = {};
-        const title = $(this).find('h2 a').text();
+        const title = $(algoEl).find('h2 a').text();
         algo.title = title;
-        algo.link = $(this).find('h2 a').attr('href');
+        algo.link = $(algoEl).find('h2 a').attr('href');
 
         let desc = '';
         let date = '';
-        if ($(this).find('.b_caption p').length > 0) {
+        if ($(algoEl).find('.b_caption p').length > 0) {
             log.info(`[START]: Page - ${title}`);
-            desc = $(this).find('.b_caption p').text();
-            if ($(this).find('.news_dt').length > 0) {
-                date = $(this).find('.news_dt').text();
+            desc = $(algoEl).find('.b_caption p').text();
+            if ($(algoEl).find('.news_dt').length > 0) {
+                date = $(algoEl).find('.news_dt').text();
                 desc = desc.replace(date, '').substr(3);
                 algo.date = date;
             }
-        } else if ($(this).find('.b_richcard').length > 0) { // rich card
-            desc = $(this).find('.b_richcard').text();
+        } else if ($(algoEl).find('.b_richcard') > 0) { // rich card
+            desc = $(algoEl).find('.b_richcard').text();
             log.info(`[START] - Richcard - ${desc}`);
-        } else if ($(this).find('.b_wikiRichcard_noHeroSection').length > 0) { // wiki rich card
-            desc = $(this).find('.tab-content').text();
+        } else if ($(algoEl).find('.b_wikiRichcard_noHeroSection').length > 0) { // wiki rich card
+            desc = $(algoEl).find('.tab-content').text();
             log.info(`[START]: Wiki richcard - ${desc}`);
-            let textUnder = $(this).find('.b_divdef > span').text();
-            let source = $(this).find('.b_divdef').text();
+            let textUnder = $(algoEl).find('.b_divdef > span').text();
+            let source = $(algoEl).find('.b_divdef').text();
             source = source.replace(textUnder, '');
             textUnder = textUnder.substr(3);
             algo.type = BING_WIKI_RICHCARD;
             algo.source = source;
             algo.textUnder = textUnder;
-        } else if ($(this).find('.b_algo_group').length > 0) { // result with groups
-            log.info(`[START]: AlgoGroup - ${$(this).find('h2').first().text()}`);
+        } else if ($(algoEl).find('.b_algo_group').length > 0) { // result with groups
+            log.info(`[START]: AlgoGroup - ${$(algoEl).find('h2').first().text()}`);
             algo.type = 'algoGroup';
             // #region dictionary
             /* TODO: To be finished
@@ -194,134 +185,119 @@ exports.handleStart = async ({ request, $ }) => {
             // #endregion
 
             // wiki group
-            if ($(this).find('.b_wiki_sub').length > 0) {
+            if ($(algoEl).find('.b_wiki_sub').length > 0) {
                 const wikiCards = [];
                 let wikiCard = {};
-                $(this).find('.b_wiki_sub_text').each(function () {
+                $(algoEl).find('.b_wiki_sub_text').each((_0, el) => {
                     wikiCard = { type: 'text' };
-                    const wikiTitle = $(this).find('.b_wiki_sub_title').text();
+                    const wikiTitle = $(el).find('.b_wiki_sub_title').text();
                     if (wikiTitle) {
                         wikiCard.title = wikiTitle;
                     }
-                    wikiCard.description = $(this).find('.b_paractl').text();
-                    wikiCard.seeMoreLink = $(this).find('.b_wiki_see_more').attr('href');
+                    wikiCard.description = $(el).find('.b_paractl').text();
+                    wikiCard.seeMoreLink = $(el).find('.b_wiki_see_more').attr('href');
                     wikiCards.push(wikiCard);
                 });
-                $(this).find('.b_wiki_img_wrapper').each(function () {
+                $(algoEl).find('.b_wiki_img_wrapper').each((_0, el) => {
                     wikiCard = { type: 'image' };
-                    const imageUrl = $(this).find('a').attr('href');
+                    const imageUrl = $(el).find('a').attr('href');
                     wikiCard.imageUrl = imageUrl;
                     wikiCards.push(wikiCard);
                 });
-
-                if (wikiCards.length > 0) {
-                    algo.wikiCards = wikiCards;
-                }
+                algo.wikiCards = wikiCards;
             }
-        } else if ($(this).find('#b_gridCarousel').length > 0) { // TODO: To be tested
-            $(this).find('#b_gridCarousel').children('.slide').each(function () {
-                log.info(`[START]: Carousel - ${$(this).text()}`);
+        } else if ($(algoEl).find('#b_gridCarousel').length > 0) { // TODO: To be tested
+            $(algoEl).find('#b_gridCarousel').children('.slide').each((_0, el) => {
+                log.info(`[START]: Carousel - ${$(el).text()}`);
             });
-        } else if ($(this).find('.b_dList').length > 0) { // List
+        } else if ($(algoEl).find('.b_dList').length > 0) { // List
             const list = [];
             let text = '';
-            $(this).find('.lisn_olitem').each(function () {
-                text = $(this).find('span').text();
+            $(algoEl).find('.lisn_olitem').each((_0, el) => {
+                text = $(el).find('span').text();
                 if (text) {
                     log.info(`[START]: List - ${text}`);
                     list.push(text);
                 }
             });
-            if (list.length > 0) {
-                algo.list = list;
-            }
+            algo.list = list;
         }
         // results recommended
         const recommendations = [];
         let recommended = {};
-        if ($(this).find('.pageRecoContainer').length > 0) {
-            $(this).find('.pageRecoContainer table tr').each(function () {
+        if ($(algoEl).find('.pageRecoContainer').length > 0) {
+            $(algoEl).find('.pageRecoContainer table tr').each((_0, el) => {
                 recommended = {};
-                recommended.description = $(this).find('a').first().text();
+                recommended.description = $(el).find('a').first().text();
                 log.info(`[START]: Page recommendation - ${recommended.description}`);
-                recommended.url = $(this).find('a').attr('href');
+                recommended.url = $(el).find('a').attr('href');
                 recommendations.push(recommended);
             });
             algo.recommendations = recommendations;
         }
-        if (desc) {
-            algo.desc = desc;
-        }
+        algo.desc = desc;
 
         pages.push(algo);
     });
 
-    if (pages.length > 0) {
-        urlResults.pages = pages;
-    }
+    urlResults.pages = pages;
     // results created by bing
-    $('#b_results > .b_ans').each(function () {
+    $('#b_results > .b_ans').each((_, relatedEl) => {
         // related search
-        if ($(this).find('.b_rs').length > 0) {
+        if ($(relatedEl).find('.b_rs').length > 0) {
             const related = [];
             let item = {};
-            $(this).find('li').each(function () {
+            $(relatedEl).find('li').each((_0, el) => {
                 item = {};
-                const text = $(this).text();
+                const text = $(el).text();
                 item.text = text;
                 log.info(`[START]: Related - ${text}`);
-                item.url = prependUrl($(this).find('a').attr('href'));
+                item.url = new URL($(el).find('a').attr('href'), `https://www.bing.com`);
                 related.push(item);
             });
-            if (related.length > 0) {
-                urlResults.related = related;
-            }
-        } else if ($(this).find('#relatedQnAListDisplay').length > 0) { // People also ask
+            urlResults.related = related;
+        } else if ($(relatedEl).find('#relatedQnAListDisplay').length > 0) { // People also ask
             const questions = [];
             let question = {};
-            $('[data-tag=RelatedQnA.Item]').each(function () {
+            $('[data-tag=RelatedQnA.Item]').each((_0, el) => {
                 question = {};
-                question.question = $(this).find('.b_1linetrunc').attr('aria-label');
-                question.url = $(this).find('.rwrl_cred a').attr('href');
-                question.title = $(this).find('.rwrl_cred a').text();
+                question.question = $(el).find('.b_1linetrunc').attr('aria-label');
+                question.url = $(el).find('.rwrl_cred a').attr('href');
+                question.title = $(el).find('.rwrl_cred a').text();
                 log.info(`[START]: Also ask - ${question.title}`);
-                question.description = $(this).find('.rwrl_padref').text();
+                question.description = $(el).find('.rwrl_padref').text();
                 questions.push(question);
             });
-            if (questions.length > 0) {
-                urlResults.questions = questions;
-            }
-        } else if ($(this).find('.exploreAns').length > 0) { // explore answers
+            urlResults.questions = questions;
+        } else if ($(relatedEl).find('.exploreAns').length > 0) { // explore answers
             const explore = [];
             let title = '';
             let slide = {};
-            $(this).find('.slide').each(function () {
+            $(relatedEl).find('.slide').each((_0, el) => {
                 slide = {};
-                title = $(this).find('.rel_ent_t').text();
+                title = $(el).find('.rel_ent_t').text();
                 if (title) {
                     log.info(`[START]: Explore - ${title}`);
                     slide.title = title;
-                    slide.imgUrl = prependUrl($(this).find('a').attr('href'));
+                    slide.imgUrl = new URL($(el).find('a').attr('href'), `https://www.bing.com`);
                     explore.push(slide);
                 }
             });
-            if (explore.length > 0) {
-                urlResults.explore = explore;
-            }
+            urlResults.explore = explore;
         }
     });
 
     // Additional results in right column
     // can be hidden for width smaller than ~1200px
     if ($('#b_context').length > 0) {
-        $('#b_context .b_ans').each(function () {
+        $('#b_context .b_ans').each((_, rightEl) => {
             // see results for
-            if ($(this).find('.disambig-outline').length > 0) {
+            if ($(rightEl).find('.disambig-outline').length > 0) {
                 const resultsFor = [];
-                $(this).find('.b_vList').each(function () {
-                    const url = prependUrl($(this).find('a').attr('href'));
-                    const title = $(this).find('.b_secondaryFocus').text();
-                    const description = $(this).find('span').attr('title');
+                $(rightEl).find('.b_vList').each((_0, el) => {
+                    const url = new URL($(el).find('a').attr('href'), `https://www.bing.com`);
+                    const title = $(el).find('.b_secondaryFocus').text();
+                    const description = $(el).find('span').attr('title');
                     log.info(`[START]: Result for - ${title}`);
                     resultsFor.push({ url, title, description });
                 });
