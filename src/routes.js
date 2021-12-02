@@ -126,7 +126,7 @@ exports.handleStart = async ({ request, $ }) => {
                 log.info(`[START]: Video - ${$(el).find('.mc_vtvc_title').text()}`);
                 video.views = $(el).find('.meta_vc_content').text();
                 video.provider = $(el).find('.mc_vtvc_meta_channel > span').first().text();
-                videos.push(el);
+                videos.push(video);
             }
         });
     });
