@@ -8,7 +8,7 @@ const Apify = require('apify');
 const { handleStart } = require('./routes');
 const { BING_DEFAULT_RESULTS_PER_PAGE } = require('./const');
 
-const { utils: { log } } = Apify;
+const { utils: { log, requestAsBrowser } } = Apify;
 
 Apify.main(async () => {
     const input = await Apify.getInput();
@@ -39,6 +39,8 @@ Apify.main(async () => {
     });
 
     log.info('Starting the crawl.');
+    const wallpaper = await getWallpaperUrl(marketCode);
+    Apify.pushData({ wallpaper });
     await crawler.run();
     log.info('Crawl finished.');
 });
@@ -84,4 +86,12 @@ function getPagesPerQuery(url, resultsPerPage, maxPagesPerQuery) {
     }
 
     return result;
+}
+
+async function getWallpaperUrl(marketCode) {
+    const url = `https://bing.com/HPImageArchive.aspx?format=js&n=1&mkt=${marketCode}`;
+    log.info(`['WALLPAPER']: Getting wallpaper - ${url}`);
+    const response = await requestAsBrowser({ url });
+    const items = response.body;
+    return new URL(JSON.parse(items).images[0].url, 'https://www.bing.com/');
 }
