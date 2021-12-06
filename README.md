@@ -9,9 +9,11 @@ The following data can be extracted from Bing search result:
 - People Also Ask
 - Wiki results
 - News, Image, Video results
+
 ## Cost of Usage
 Actor uses default proxy configuration to minimalize the chance of being blocked. Content and language does not depend on proxy location, since it can be set with input. <br />
 Usage depends on complexity of search results created by Bing. On average scraper set on default 10 results per page use 1 CU per 300 pages.
+
 ## Input
 ### Search queries or URLs - ```queries```
 *Optional - String*
