@@ -9,7 +9,7 @@
       "type": "array",
       "description": "Bing Search queries (e.g. food in NYC) and/or full URLs (e.g. https://www.bing.com/search?q=food+NYC). Enter one item per line.",
       "prefill": ["Hotels in NYC", "Restaurants in NYC", "https://www.bing.com/search?q=restaurants+in+NYC"],
-      "editor": "pseudoUrls"
+      "editor": "stringList"
   },
   "resultsPerPage": {
       "title": "Results per page",
