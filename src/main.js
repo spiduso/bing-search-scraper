@@ -38,7 +38,6 @@ Apify.main(async () => {
 });
 
 function getUrls(queries, marketCode, languageCode, resultsPerPage, maxPagesPerQuery) {
-    const splittedQueries = queries.split('\n');
     const result = [];
     let parameters = '';
     if (marketCode) {
@@ -52,7 +51,7 @@ function getUrls(queries, marketCode, languageCode, resultsPerPage, maxPagesPerQ
     }
 
     // https://www.bing.com/search?q=student&setmkt=en-US&setLang=en"
-    for (const splittedQuery of splittedQueries) {
+    for (const splittedQuery of queries) {
         if (splittedQuery.startsWith('https://www.bing.com/search?q=')) {
             const url = splittedQuery + parameters;
 
