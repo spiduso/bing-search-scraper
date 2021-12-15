@@ -48,6 +48,7 @@ exports.handleStart = async ({ request, $ }) => {
         urlResults.subquery = $('#sp_requery a').first().text();
     }
 
+    /*
     // TODO: Ads not tested yet
     const ads = [];
     $('#b_results .b_ad').each((_, el) => {
@@ -59,6 +60,7 @@ exports.handleStart = async ({ request, $ }) => {
         ads.push(ad);
     });
     urlResults.ads = ads;
+    */
 
     // topborder result
     const topBorders = [];
