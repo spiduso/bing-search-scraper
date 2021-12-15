@@ -6,17 +6,17 @@
   "properties": {
     "queries": {
       "title": "Search queries or URLs",
-      "type": "string",
+      "type": "array",
       "description": "Bing Search queries (e.g. food in NYC) and/or full URLs (e.g. https://www.bing.com/search?q=food+NYC). Enter one item per line.",
-      "prefill": "Hotels in NYC\nRestaurants in NYC\nhttps://www.bing.com/search?q=restaurants+in+NYC",
-      "editor": "textarea",
-      "pattern": "[^\\s]+"
+      "prefill": ["Hotels in NYC", "Restaurants in NYC", "https://www.bing.com/search?q=restaurants+in+NYC"],
+      "editor": "pseudoUrls"
   },
   "resultsPerPage": {
       "title": "Results per page",
       "type": "integer",
       "description": "Number of search results per page. By default, Bing Search returns 10 results. The allowed values are between 1 and 100.",
       "maximum": 100,
+      "default": 10,
       "minimum": 1,
       "prefill": 10
   },
@@ -24,6 +24,7 @@
       "title": "Max pages per query",
       "type": "integer",
       "description": "The maximum number of search result pages crawled for each search query or URL. Note that a value greater than one might significantly slow down the actor.",
+      "default": 1,
       "prefill": 1,
       "minimum": 1
   },
@@ -31,8 +32,11 @@
       "title": "Market Code",
       "type": "string",
       "description": "Bing Search returns content for set market.",
+      "prefill": "en-US",
       "editor": "select",
       "enum": [
+        "en-US",
+        "en-GB",
         "es-AR",
         "en-AU",
         "de-AT",
@@ -68,11 +72,11 @@
         "de-CH",
         "zh-TW",
         "tr-TR",
-        "en-GB",
-        "en-US",
         "es-US"
       ],
       "enumTitles": [
+        "United States - English",
+        "United Kingdom",
         "Argentina",
         "Australia",
         "Austria",
@@ -108,8 +112,6 @@
         "Switzerland - German",
         "Taiwan",
         "Turkey",
-        "United Kingdom",
-        "United States - English",
         "United States - Spanish"
         ]
   },
@@ -118,7 +120,10 @@
     "type": "string",
     "description": "Language for the search results.",
     "editor": "select",
+    "prefill": "en",
     "enum":[
+      "en",
+      "en-gb",
       "ar",
       "eu",
       "bn",
@@ -130,8 +135,6 @@
       "cs",
       "da",
       "nl",
-      "en",
-      "en-gb",
       "et",
       "fi",
       "fr",
@@ -171,6 +174,8 @@
       "vi"
     ],
     "enumTitles":[
+      "English",
+      "English-United Kingdom",
       "Arabic",
       "Basque",
       "Bengali",
@@ -182,8 +187,6 @@
       "Czech",
       "Danish",
       "Dutch",
-      "English",
-      "English-United Kingdom",
       "Estonian",
       "Finnish",
       "French",
@@ -234,5 +237,5 @@
     "sectionDescription": "Here you can specify further parameters of the scrape. However we worked hard to set the best options for you already."
   }
   },
-  "required": []
+  "required": ["queries", "marketCode"]
 }
