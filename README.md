@@ -2,7 +2,6 @@
 ## Features
 The following data can be extracted from Bing search result:
 - Organic results
-- Ads
 - Related queries
 - See results for
 - Recommended searches
@@ -35,104 +34,15 @@ The maximum number of search result pages crawled for each search query or URL. 
 Bing Search returns content for set market.
 <hr>
 
-|Country/Region|Default Language|Market code|
-|---|---|---|
-Argentina|Spanish|es-AR
-Australia|English|en-AU
-Austria|German|de-AT
-Belgium|Dutch|nl-BE
-Belgium|French|fr-BE
-Brazil|Portuguese|pt-BR
-Canada|English|en-CA
-Canada|French|fr-CA
-Chile|Spanish|es-CL
-Denmark|Danish|da-DK
-Finland|Finnish|fi-FI
-France|French|fr-FR
-Germany|German|de-DE
-Hong Kong SAR|Traditional Chinese|zh-HK
-India|English|en-IN
-Indonesia|English|en-ID
-Italy|Italian|it-IT
-Japan|Japanese|ja-JP
-Korea|Korean|ko-KR
-Malaysia|English|en-MY
-Mexico|Spanish|es-MX
-Netherlands|Dutch|nl-NL
-New Zealand|English|en-NZ
-Norway|Norwegian|no-NO
-People's republic of China|Chinese|zh-CN
-Poland|Polish|pl-PL
-Republic of the Philippines|English|en-PH
-Russia|Russian|ru-RU
-South Africa|English|en-ZA
-Spain|Spanish|es-ES
-Sweden|Swedish|sv-SE
-Switzerland|French|fr-CH
-Switzerland|German|de-CH
-Taiwan|Traditional Chinese|zh-TW
-Turkey|Turkish|tr-TR
-United Kingdom|English|en-GB
-United States|English|en-US
-United States|Spanish|es-US
-
 ### Language - ```languageCode```
 Language for the search results.
 *Optional - String*
 <hr>
 
-|Language|Language Code|
-|---|---|
-Arabic|ar
-Basque|eu
-Bengali|bn
-Bulgarian|bg
-Catalan|ca
-Chinese (Simplified)|zh-hans
-Chinese (Traditional)|zh-hant
-Croatian|hr
-Czech|cs
-Danish|da
-Dutch|nl
-English|en
-English-United Kingdom|en-gb
-Estonian|et
-Finnish|fi
-French|fr
-Galician|gl
-German|de
-Gujarati|gu
-Hebrew|he
-Hindi|hi
-Hungarian|hu
-Icelandic|is
-Italian|it
-Japanese|jp
-Kannada|kn
-Korean|ko
-Latvian|lv
-Lithuanian|lt
-Malay|ms
-Malayalam|ml
-Marathi|mr
-Norwegian (Bokmål)|nb
-Polish|pl
-Portuguese (Brazil)|pt-br
-Portuguese (Portugal)|pt-pt
-Punjabi|pa
-Romanian|ro
-Russian|ru
-Serbian (Cyrylic)|sr
-Slovak|sk
-Slovenian|sl
-Spanish|es
-Swedish|sv
-Tamil|ta
-Telugu|te
-Thai|th
-Turkish|tr
-Ukrainian|uk
-Vietnamese|vi
+### CSV friendliness - ```csvFriendliness```
+Remove results that are not CSV friendly.
+*Optional - boolean*
+<hr>
 
 ## Results
 Actor stores its result in the default dataset associated with the run, which you can export to various formats.
@@ -149,7 +59,6 @@ For each Bing search results page, the dataset will contain a single record, whi
   "url": "https://www.bing.com/search?q=restaurants+in+NYC&setmkt=en-US&setLang=en&count=20",
   "keyword": "restaurants in NYC",
   "pageNumber": "1",
-  "ads": [],
   "topBorders": [
     {
       "type": "topborder",

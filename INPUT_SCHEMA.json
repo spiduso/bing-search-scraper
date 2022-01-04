@@ -235,6 +235,12 @@
     "minimum": 1,
     "sectionCaption": "Advanced options (for developers)",
     "sectionDescription": "Here you can specify further parameters of the scrape. However we worked hard to set the best options for you already."
+  },
+  "csvFriendliness": {
+      "title": "CSV friendliness",
+      "type": "boolean",
+      "description": "Remove results that are not CSV friendly.",
+      "default": false
   }
   },
   "required": ["queries", "marketCode"]
