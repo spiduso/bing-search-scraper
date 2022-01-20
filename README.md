@@ -39,6 +39,11 @@ Language for the search results.
 *Optional - String*
 <hr>
 
+### Proxy - ```proxyConfiguration```
+Sets up the proxies.
+*Optional - Object*
+<hr>
+
 ### CSV friendliness - ```csvFriendliness```
 Remove results that are not CSV friendly.
 *Optional - boolean*
