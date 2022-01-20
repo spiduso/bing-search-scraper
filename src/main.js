@@ -13,22 +13,26 @@ Apify.main(async () => {
         marketCode,
         languageCode,
         maxConcurrency,
+        csvFriendliness,
+        proxyConfiguration,
     } = input;
 
     const urls = getUrls(queries, marketCode, languageCode, resultsPerPage, maxPagesPerQuery);
     const requestList = await Apify.openRequestList('START', urls);
     const requestQueue = await Apify.openRequestQueue();
-    const proxyConfiguration = await Apify.createProxyConfiguration();
+    const proxyConfig = await proxyConfiguration({
+        proxyConfig: input.proxyConfiguration,
+    });
 
     const crawler = new Apify.CheerioCrawler({
         requestList,
         requestQueue,
-        proxyConfiguration,
+        proxyConfig,
         maxConcurrency,
         handlePageFunction: async (context) => {
             const { url, userData: { label } } = context.request;
             log.info('Page opened.', { label, url });
-            return handleStart(context);
+            return handleStart(context, csvFriendliness);
         },
     });
 

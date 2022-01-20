@@ -241,6 +241,16 @@
       "type": "boolean",
       "description": "Remove results that are not CSV friendly.",
       "default": false
+  },
+  "proxyConfiguration": {
+  "title": "Set up your proxy configuration",
+  "type": "object",
+  "editor": "proxy",
+  "description": "Automatic proxy and the country of your choice is usually the best option, but you can also select specific proxies, or use your own custom proxies.",
+  "prefill": {
+  "useApifyProxy": true
+  },
+  "sectionCaption": "Proxy & browser configuration"
   }
   },
   "required": ["queries", "marketCode"]
