@@ -14,20 +14,18 @@ Apify.main(async () => {
         languageCode,
         maxConcurrency,
         csvFriendliness,
-        proxyConfiguration,
+        proxyConfig,
     } = input;
 
     const urls = getUrls(queries, marketCode, languageCode, resultsPerPage, maxPagesPerQuery);
     const requestList = await Apify.openRequestList('START', urls);
     const requestQueue = await Apify.openRequestQueue();
-    const proxyConfig = await proxyConfiguration({
-        proxyConfig: input.proxyConfiguration,
-    });
+    const proxyConfiguration = await Apify.createProxyConfiguration(proxyConfig);
 
     const crawler = new Apify.CheerioCrawler({
         requestList,
         requestQueue,
-        proxyConfig,
+        proxyConfiguration,
         maxConcurrency,
         handlePageFunction: async (context) => {
             const { url, userData: { label } } = context.request;
