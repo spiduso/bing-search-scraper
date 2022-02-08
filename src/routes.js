@@ -16,14 +16,9 @@ exports.handleStart = async ({ request, $ }, csvFriendliness) => {
     // results count
     const countEl = $('#b_tween > .sb_count');
     if (countEl.length > 0) {
-        const splitted = countEl.text().replaceAll(',', '').split(' ');
-
-        for (let i = 0; i < splitted.length; i++) {
-            if (!Number.isNaN(splitted[i])) {
-                log.info(`[START]: Results found: ${splitted[i]}`);
-                urlResults.count = splitted[i];
-            }
-        }
+        const splitted = countEl.text().replaceAll(',', '').replaceAll('.', '').split(' ');
+        log.info(`[START]: Results found: ${splitted[0]}`);
+        urlResults.count = splitted[i];
     } else if ($('#b_results .b_no').length > 0) { // no results, try 2 more times
         if (request.retryCount < 3) {
             throw new Error('No results found, retrying...');
@@ -64,7 +59,6 @@ exports.handleStart = async ({ request, $ }, csvFriendliness) => {
 
     // topborder result
     if (!csvFriendliness) {
-        log.info('csv friendly');
         const topBorders = [];
         $('#b_results > .b_topborder').each((_, el) => {
             const topborder = { type: 'topborder' };
