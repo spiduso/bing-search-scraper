@@ -18,7 +18,7 @@ exports.handleStart = async ({ request, $ }, csvFriendliness) => {
     if (countEl.length > 0) {
         const splitted = countEl.text().replaceAll(',', '').replaceAll('.', '').split(' ');
         log.info(`[START]: Results found: ${splitted[0]}`);
-        urlResults.count = splitted[i];
+        urlResults.count = splitted[0];
     } else if ($('#b_results .b_no').length > 0) { // no results, try 2 more times
         if (request.retryCount < 3) {
             throw new Error('No results found, retrying...');
